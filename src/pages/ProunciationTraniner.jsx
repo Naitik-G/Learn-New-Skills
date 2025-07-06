@@ -9,12 +9,15 @@ import UserTranscript from "../components/UserTranscript"; // Will be updated to
 import Feedback from "../components/Feedback";
 import ProgressBar from "../components/ProgressBar";
 import Instructions from "../components/Instructions";
-// import Header from "../components/Header";
 
 import useSpeechSynthesis from "../hooks/useSpeechSynthesis.js";
 import useSpeechRecognition from "../hooks/useSpeechRcognition.js";
 import { sentences } from "../utils/sentences.js";
-import { calculateSimilarity, getWordFeedback, mapWordFeedbackToHighlightedWords } from "../utils/pronunciationUtils.js";
+import {
+  calculateSimilarity,
+  getWordFeedback,
+  mapWordFeedbackToHighlightedWords,
+} from "../utils/pronunciationUtils.js";
 
 // Main Component
 const PronunciationTrainer = () => {
@@ -62,7 +65,9 @@ const PronunciationTrainer = () => {
     if (currentSentenceIndex < sentences[currentLevel].length - 1) {
       setCurrentSentenceIndex((prev) => prev + 1);
     } else {
-      setFeedback("🎯 Level completed! Great work! Resetting to first sentence.");
+      setFeedback(
+        "🎯 Level completed! Great work! Resetting to first sentence."
+      );
       // Optionally reset to the first sentence or move to next level
       setCurrentSentenceIndex(0);
     }
@@ -79,7 +84,8 @@ const PronunciationTrainer = () => {
       setWordFeedback(detailedFeedback);
 
       // Map detailed feedback to the simple correct/incorrect array for SentenceDisplay
-      const simpleHighlighted = mapWordFeedbackToHighlightedWords(detailedFeedback);
+      const simpleHighlighted =
+        mapWordFeedbackToHighlightedWords(detailedFeedback);
       setHighlightedWords(simpleHighlighted);
 
       // Calculate overall similarity for scoring and progress bar
@@ -92,23 +98,36 @@ const PronunciationTrainer = () => {
       setProgress(similarity);
 
       // Determine overall feedback based on similarity and word correctness
-      const correctlyPronouncedWords = detailedFeedback.filter(item => item.correct).length;
-      const totalTargetWords = currentSentence.text.split(" ").filter(Boolean).length;
-      const wordAccuracyPercentage = (correctlyPronouncedWords / totalTargetWords) * 100;
+      const correctlyPronouncedWords = detailedFeedback.filter(
+        (item) => item.correct
+      ).length;
+      const totalTargetWords = currentSentence.text
+        .split(" ")
+        .filter(Boolean).length;
+      const wordAccuracyPercentage =
+        (correctlyPronouncedWords / totalTargetWords) * 100;
 
-      if (wordAccuracyPercentage >= 90 && similarity >= 90) { // Very high accuracy
+      if (wordAccuracyPercentage >= 90 && similarity >= 90) {
+        // Very high accuracy
         setScore((prev) => prev + 10);
         setStreak((prev) => prev + 1);
         setFeedback("🎉 Excellent! Perfect pronunciation!");
         setTimeout(nextSentence, 2000);
-      } else if (wordAccuracyPercentage >= 70 && similarity >= 70) { // Good accuracy
+      } else if (wordAccuracyPercentage >= 70 && similarity >= 70) {
+        // Good accuracy
         setScore((prev) => prev + 5);
         setFeedback("👍 Good job! Most words were clear.");
-      } else if (wordAccuracyPercentage >= 50 && similarity >= 50) { // Moderate accuracy
-        setFeedback("👌 You're getting there! Focus on the words marked in red.");
-      } else { // Needs more practice
+      } else if (wordAccuracyPercentage >= 50 && similarity >= 50) {
+        // Moderate accuracy
+        setFeedback(
+          "👌 You're getting there! Focus on the words marked in red."
+        );
+      } else {
+        // Needs more practice
         setStreak(0);
-        setFeedback("🔄 Keep practicing! Listen carefully and try again. Pay attention to the underlined words.");
+        setFeedback(
+          "🔄 Keep practicing! Listen carefully and try again. Pay attention to the underlined words."
+        );
       }
     },
     [currentSentence, nextSentence]
@@ -150,29 +169,35 @@ const PronunciationTrainer = () => {
 
   // Stop recording if component unmounts or if listening state becomes false unexpectedly
   useEffect(() => {
-    if (!listening && userTranscript && !feedback) { // If not listening and a transcript was received but no feedback yet, means recognition finished
-        // This useEffect could be tricky with the async nature of speech recognition.
-        // It's usually better to rely on `onend` callback from the recognition API.
-        // For our current mock/simple setup, we let `checkPronunciation` handle the flow.
+    if (!listening && userTranscript && !feedback) {
+      // If not listening and a transcript was received but no feedback yet, means recognition finished
+      // This useEffect could be tricky with the async nature of speech recognition.
+      // It's usually better to rely on `onend` callback from the recognition API.
+      // For our current mock/simple setup, we let `checkPronunciation` handle the flow.
     }
     return () => {
       stopRecording(); // Cleanup on unmount
     };
   }, [listening, userTranscript, feedback]);
 
-
   return (
     <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-screen mt-20">
       <div className="bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl p-8">
         {/* <Header /> */}
-
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-100 mb-2">
+            🗣️ Pronunciation Trainer
+          </h1>
+          <p className="text-gray-400">
+            Improve your English pronunciation with interactive practice
+          </p>
+        </div>
         <StatsBar
           score={score}
           streak={streak}
           attempts={attempts}
           progress={progress}
         />
-
         <LevelSelection
           currentLevel={currentLevel}
           setCurrentLevel={setCurrentLevel}
@@ -182,7 +207,6 @@ const PronunciationTrainer = () => {
           setWordFeedback={setWordFeedback} // Pass this to reset
           setFeedback={setFeedback} // Pass this to reset
         />
-
         <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 mb-6">
           <div className="text-center mb-4">
             <span className="text-sm text-gray-400">
@@ -214,8 +238,8 @@ const PronunciationTrainer = () => {
             setShowHints={setShowHints}
           />
         </div>
-
-        <UserTranscript wordFeedback={wordFeedback} /> {/* Pass the new wordFeedback prop */}
+        <UserTranscript wordFeedback={wordFeedback} />{" "}
+        {/* Pass the new wordFeedback prop */}
         <Feedback feedback={feedback} />
         <ProgressBar progress={progress} />
         <Instructions />

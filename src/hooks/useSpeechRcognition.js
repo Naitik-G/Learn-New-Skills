@@ -1,4 +1,4 @@
-// src/hooks/useSpeechRecognition.js
+ // src/hooks/useSpeechRecognition.js
 import { useState, useEffect, useRef } from "react";
 
 const useSpeechRecognition = ({ onResult, onError }) => {
