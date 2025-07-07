@@ -1,44 +1,34 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom'; // Import these hooks
 
 const Sections = () => {
-  const [currentPath, setCurrentPath] = useState('/');
+  const navigate = useNavigate(); // Initialize navigate
+  const location = useLocation(); // Initialize location
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
-    // Set initial path based on current location
-    setCurrentPath(window.location.pathname);
+    // No need to set currentPath here if using navigate for routing
   }, []);
 
+  // Use the navigate function directly
   const handleNavigation = (path) => {
-    setCurrentPath(path);
-    // You can replace this with your routing logic
-    // For now, it just updates the current path state
-    if (path === '/') {
-      // Show home content
-    } else if (path === '/conversation') {
-      // Navigate to conversation page
-      window.location.href = '/conversation';
-    } else if (path === '/prounctiationtraniner') {
-      // Navigate to pronunciation trainer page
-      window.location.href = '/prounctiationtraniner';
-    }
+    navigate(path);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-   
-
       {/* Main Content */}
       <div className={`pt-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-        <Home />
+        {/* Pass navigate and location as props to Home */}
+        <Home navigate={navigate} location={location} /> 
       </div>
 
       {/* Floating Action Button */}
       <div className="fixed bottom-8 right-8 z-40">
         <button 
           className="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group hover:scale-110"
-          onClick={() => handleNavigation('/pronunciationtrainer')}
+          onClick={() => handleNavigation('/prounctiationtraniner')} // Corrected path
         >
           <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">🚀</span>
         </button>
@@ -48,7 +38,7 @@ const Sections = () => {
 };
 
 // Home Component with updated navigation links
-const Home = () => {
+const Home = ({ navigate, location }) => { // Receive navigate and location as props
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -57,7 +47,7 @@ const Home = () => {
   }, []);
 
   const handleFeatureClick = (path) => {
-    window.location.href = path;
+    navigate(path); // Use navigate from props
   };
 
   const features = [
@@ -118,7 +108,7 @@ const Home = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <button 
-                onClick={() => handleFeatureClick('/pronunciationtrainer')}
+                onClick={() => handleFeatureClick('/prounctiationtraniner')} // Corrected path
                 className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105"
               >
                 🚀 Start Learning Now
@@ -206,7 +196,7 @@ const Home = () => {
                 </div>
               </div>
               <button 
-                onClick={() => handleFeatureClick('/pronunciationtrainer')}
+                onClick={() => handleFeatureClick('/prounctiationtraniner')} // Corrected path
                 className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-300"
               >
                 Continue Learning
