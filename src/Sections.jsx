@@ -66,7 +66,7 @@ const Home = () => {
       title: 'Pronunciation Practice',
       description: 'Improve your English pronunciation with AI-powered feedback',
       color: 'from-blue-500 to-cyan-500',
-      path: 'prounctiationtraniner'
+      path: '/prounctiationtraniner'
     },
     {
       icon: '💬',
