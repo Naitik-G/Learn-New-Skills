@@ -19,9 +19,9 @@ const Sections = () => {
     } else if (path === '/conversation') {
       // Navigate to conversation page
       window.location.href = '/conversation';
-    } else if (path === 'prounctiationtraniner') {
+    } else if (path === '/prounctiationtraniner') {
       // Navigate to pronunciation trainer page
-      window.location.href = 'prounctiationtraniner';
+      window.location.href = '/prounctiationtraniner';
     }
   };
 
