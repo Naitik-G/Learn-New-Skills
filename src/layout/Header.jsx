@@ -23,7 +23,13 @@ const Header = () => {
       title: 'Pronunciation',
       icon: '🎤',
       path: '/prounctiationtraniner'
-    }
+    },
+    {
+      id: 'quiz',
+      title: 'Quiz',
+      icon: '🎤',
+      path: '/quizpage'
+    },
   ];
 
   const handleNavigation = (path) => {

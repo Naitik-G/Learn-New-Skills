@@ -6,7 +6,6 @@ import './index.css';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import Sections from './Sections.jsx';
 import QuizPage from './pages/QuizPage.jsx';
-import ResultPage from "./pages/ResultPage.jsx";
 import Conversation from "./pages/Conversation.jsx";
 import PronunciationTrainer from "./pages/ProunciationTraniner.jsx";
 
@@ -26,10 +25,7 @@ const router = createBrowserRouter([
         element: <QuizPage />
       },
      
-      {
-        path: '/resultpage',
-        element: <ResultPage />
-      },
+    
       {
         path: '/conversation',
         element: <Conversation />
