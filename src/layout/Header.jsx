@@ -52,10 +52,10 @@ const Header = () => {
             onClick={() => handleNavigation('/')}
           >
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">EL</span>
+              <span className="text-white font-bold text-sm">LNS</span>
             </div>
             <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              English Learning Hub
+              Learn New Skills
             </h1>
           </div>
           
