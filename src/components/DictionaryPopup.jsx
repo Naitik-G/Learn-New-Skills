@@ -267,51 +267,78 @@ const DictionaryPopup = ({ word, position, onClose, isMobile = false }) => {
   const [translationLoading, setTranslationLoading] = useState(false);
   const popupRef = useRef(null);
 
-  // Get user location with better fallback handling
+  // Get user location with hybrid approach
   useEffect(() => {
     const getUserLocation = async () => {
       try {
-        // Method 1: Try ip-api.com for country code
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3-second timeout
+        const isDesktop = window.innerWidth > 768;
+        let countryCode = null;
+        let data = null;
 
-        const response = await fetch('http://ip-api.com/json', {
-          signal: controller.signal,
-          headers: {
-            'Accept': 'application/json',
-          }
-        });
-        clearTimeout(timeoutId);
+        if (isDesktop) {
+          // Use ipapi.co for desktop devices
+          console.log('Using ipapi.co for desktop device.');
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-        if (response.ok) {
-          const data = await response.json();
-          // ip-api.com returns 'countryCode'
-          if (data.status === 'success' && data.countryCode) {
-            const countryCode = data.countryCode;
-            if (countryToLanguage[countryCode]) {
-              setUserLocation(countryCode);
-              setUserLanguage(countryToLanguage[countryCode]);
-              return; // Exit if successful
+          try {
+            const response = await fetch('https://ipapi.co/json/', {
+              signal: controller.signal,
+              headers: { 'Accept': 'application/json' }
+            });
+            clearTimeout(timeoutId);
+            if (response.ok) {
+              data = await response.json();
+              if (data && data.country_code) {
+                countryCode = data.country_code;
+              }
             }
+          } catch (e) {
+            console.log('ipapi.co failed:', e.message);
+          }
+        } else {
+          // Use ip-api.com for mobile and tablet devices
+          console.log('Using ip-api.com for mobile/tablet device.');
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+          try {
+            const response = await fetch('http://ip-api.com/json', {
+              signal: controller.signal,
+              headers: { 'Accept': 'application/json' }
+            });
+            clearTimeout(timeoutId);
+            if (response.ok) {
+              data = await response.json();
+              if (data && data.status === 'success' && data.countryCode) {
+                countryCode = data.countryCode;
+              }
+            }
+          } catch (e) {
+            console.log('ip-api.com failed:', e.message);
           }
         }
-        throw new Error('ip-api.com failed or no country data');
+
+        if (countryCode && countryToLanguage[countryCode]) {
+          setUserLocation(countryCode);
+          setUserLanguage(countryToLanguage[countryCode]);
+        } else {
+          // Fallback to browser language if IP detection fails
+          throw new Error('IP detection failed, falling back to browser language.');
+        }
 
       } catch (error) {
-        console.log('IP location detection failed, using browser language as fallback:', error.message);
+        console.log('Location detection failed:', error.message);
 
-        // Enhanced browser language detection as a fallback
+        // Fallback to browser language
         const getBrowserLanguage = () => {
           const languages = [
             navigator.language,
-            ...(navigator.languages || []),
-            navigator.userLanguage,
-            navigator.browserLanguage,
-            navigator.systemLanguage
+            ...(navigator.languages || [])
           ].filter(Boolean);
 
           for (const lang of languages) {
-            const langCode = lang.split('-')[0].toLowerCase(); // Get base language code (e.g., 'en' from 'en-US')
+            const langCode = lang.split('-')[0].toLowerCase();
             const langData = Object.values(countryToLanguage).find(l => l.code === langCode);
             if (langData) {
               return { langData, langCode };
@@ -323,19 +350,16 @@ const DictionaryPopup = ({ word, position, onClose, isMobile = false }) => {
         const browserLang = getBrowserLanguage();
         if (browserLang) {
           setUserLanguage(browserLang.langData);
-          // Set a generic location based on language if IP detection failed
           const countryForLang = Object.keys(countryToLanguage).find(
             country => countryToLanguage[country].code === browserLang.langCode
           );
           if (countryForLang) {
             setUserLocation(countryForLang);
           } else {
-            // If no specific country for the browser language, default to US/English
             setUserLanguage({ code: 'en', name: 'English' });
             setUserLocation('US');
           }
         } else {
-          // Ultimate fallback - assume English
           setUserLanguage({ code: 'en', name: 'English' });
           setUserLocation('US');
         }
@@ -517,7 +541,6 @@ const DictionaryPopup = ({ word, position, onClose, isMobile = false }) => {
     // Mobile-first responsive sizing
     const isMobileDevice = window.innerWidth <= 768;
     const popupWidth = isMobileDevice ? Math.min(320, window.innerWidth - 20) : 350;
-    const popupHeight = isMobileDevice ? 'auto' : 250;
     const padding = isMobileDevice ? 10 : 10;
 
     if (isMobileDevice) {
